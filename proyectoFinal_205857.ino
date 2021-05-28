@@ -6,7 +6,7 @@
 const int PIN_SENSOR = A0;
 const int PIN_FOTO_RGB = A1;
 
-const unsigned int PIN_SERVO = 11;
+const unsigned int PIN_SERVO = 13;
 // PIN LED
 const int PIN_LED_LUZ = 10;
 
@@ -86,6 +86,7 @@ bool aEstadoLed = false;
 bool aEstadoLedAnterior = false;
 
 bool estadoRGB_actual = false;
+bool aLedAuto=true;
 
 void setup() {
   Serial.begin(BAUD_RATE);
@@ -126,12 +127,12 @@ void loop() {
 
   //se verifica si es que fueron presionados
   if (debouncer.fell()) {
-    Serial.println("izquierda");
+    //Serial.println("izquierda");
     ventanaAutomatica = false;
     botonIzquierda();
   }
   if (debouncerDer.fell()) {
-    Serial.println("derecha");
+    //Serial.println("derecha");
     ventanaAutomatica = false;
     botonDerecha();
   }
@@ -182,7 +183,7 @@ void loop() {
     anguloVentanaAutomatica = 45;
   }
 
-  if (aEstadoLed != aEstadoLedAnterior) {
+  if (aEstadoLed != aEstadoLedAnterior && aLedAuto) {
     aEstadoLedAnterior = aEstadoLed;
     cambiarEstadoLed();
     Serial.println(valor);
@@ -194,7 +195,7 @@ void loop() {
     }
   }
   if (ventanaAutomatica) {
-    servo.write(anguloVentanaAutomatica);
+    servo.write(anguloVentanaAutomatica); 
   }
 
   if (Serial.available() > 0) {
@@ -218,65 +219,78 @@ void manejarRecibido(char comando[]) {
   if (!strcmp(comando, "LON")) {
     estado_luz = LON;
     estadoLEDS();
+    Serial.println("LON");
   }
   else if (!strcmp(comando, "LOFF")) {
     estado_luz = LOFF;
     RGB_color(0, 0, 0);
+    Serial.println("LOFF");
   }
   else if (!strcmp(comando, "LAUTO")) {
     estado_luz = LAUTO;
+    Serial.println("LAUTO");
   }
   else if (!strcmp(comando, "IBAJA")) {
     intencidad = IBAJA;
     estadoIntencidad = false;
+    Serial.println("IBAJA");
   }
   else if (!strcmp(comando, "IMEDIO")) {
     intencidad = IMEDIO;
     estadoIntencidad = false;
+    Serial.println("IMEDIO");
   }
   else if (!strcmp(comando, "IALTO")) {
     intencidad = IALTO;
     estadoIntencidad = false;
+    Serial.println("IALTO");
   }
   else if (!strcmp(comando, "IAUTO")) {
     estadoIntencidad = true;
+    estado_luz = LAUTO;
+    Serial.println("IAUTO");
   }
   else if (!strcmp(comando, "LED_ON")) {
+    aLedAuto=false;
     estadoLED = LED_ON;
     digitalWrite(PIN_LED_LUZ, HIGH);
     Serial.println("LED_ON");
   }
   else if (!strcmp(comando, "LED_OFF")) {
     estadoLED = LED_OFF;
+    aLedAuto=false;
     digitalWrite(PIN_LED_LUZ, LOW );
     Serial.println("LED_OFF");
   }
   else if (!strcmp(comando, "LED_AUTO")) {
     estadoLED = LED_ON;
+    aLedAuto=true;
+    Serial.println("LED_AUTO");
   }
-  else if (!strcmp(comando, "45")) {
+  else if (!strcmp(comando, "A45")) {
     ventanaAutomatica = false;
     servo.write(45);
-    Serial.println("45");
+    Serial.println("A45");
   }
-  else if (!strcmp(comando, "90")) {
+  else if (!strcmp(comando, "A90")) {
     ventanaAutomatica = false;
     servo.write(90);
-    Serial.println("90");
+    Serial.println("A90");
   }
-  else if (!strcmp(comando, "135")) {
+  else if (!strcmp(comando, "A135")) {
     ventanaAutomatica = false;
     servo.write(135);
-    Serial.println("135");
+    Serial.println("A135");
   }
-  else if (!strcmp(comando, "180")) {
+  else if (!strcmp(comando, "A180")) {
     ventanaAutomatica = false;
     servo.write(180);
-    Serial.println("180");
+    Serial.println("A180");
   }
-  else if (!strcmp(comando, "VAUTO")) {
+  else if (!strcmp(comando, "VAUT")) {
     ventanaAutomatica = true;
     servo.write(45);
+    Serial.println("VAUT");
   }
 }
 
